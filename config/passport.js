@@ -1,27 +1,34 @@
+'use strict';
+
 var mongoose = require('mongoose'),
     LocalStrategy = require('passport-local').Strategy,
     TwitterStrategy = require('passport-twitter').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy,
     GitHubStrategy = require('passport-github').Strategy,
-    GoogleStrategy = require('passport-google-oauth').Strategy,
-    User = mongoose.model('User');
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+    LinkedinStrategy = require('passport-linkedin').Strategy,
+    User = mongoose.model('User'),
+    config = require('./config');
 
 
-module.exports = function(passport, config) {
-    //Serialize sessions
+module.exports = function(passport) {
+
+    // Serialize the user id to push into the session
     passport.serializeUser(function(user, done) {
         done(null, user.id);
     });
 
+    // Deserialize the user object based on a pre-serialized token
+    // which is the user id
     passport.deserializeUser(function(id, done) {
         User.findOne({
             _id: id
-        }, function(err, user) {
+        }, '-salt -hashed_password', function(err, user) {
             done(err, user);
         });
     });
 
-    //Use local strategy
+    // Use local strategy
     passport.use(new LocalStrategy({
             usernameField: 'email',
             passwordField: 'password'
@@ -48,7 +55,7 @@ module.exports = function(passport, config) {
         }
     ));
 
-    //Use twitter strategy
+    // Use twitter strategy
     passport.use(new TwitterStrategy({
             consumerKey: config.twitter.clientID,
             consumerSecret: config.twitter.clientSecret,
@@ -56,7 +63,7 @@ module.exports = function(passport, config) {
         },
         function(token, tokenSecret, profile, done) {
             User.findOne({
-                'twitter.id': profile.id
+                'twitter.id_str': profile.id
             }, function(err, user) {
                 if (err) {
                     return done(err);
@@ -79,7 +86,7 @@ module.exports = function(passport, config) {
         }
     ));
 
-    //Use facebook strategy
+    // Use facebook strategy
     passport.use(new FacebookStrategy({
             clientID: config.facebook.clientID,
             clientSecret: config.facebook.clientSecret,
@@ -111,7 +118,7 @@ module.exports = function(passport, config) {
         }
     ));
 
-    //Use github strategy
+    // Use github strategy
     passport.use(new GitHubStrategy({
             clientID: config.github.clientID,
             clientSecret: config.github.clientSecret,
@@ -140,10 +147,10 @@ module.exports = function(passport, config) {
         }
     ));
 
-    //Use google strategy
+    // Use google strategy
     passport.use(new GoogleStrategy({
-            consumerKey: config.google.clientID,
-            consumerSecret: config.google.clientSecret,
+            clientID: config.google.clientID,
+            clientSecret: config.google.clientSecret,
             callbackURL: config.google.callbackURL
         },
         function(accessToken, refreshToken, profile, done) {
@@ -159,6 +166,35 @@ module.exports = function(passport, config) {
                         google: profile._json
                     });
                     user.save(function(err) {
+                        if (err) console.log(err);
+                        return done(err, user);
+                    });
+                } else {
+                    return done(err, user);
+                }
+            });
+        }
+    ));
+
+    // use linkedin strategy
+    passport.use(new LinkedinStrategy({
+            consumerKey: config.linkedin.clientID,
+            consumerSecret: config.linkedin.clientSecret,
+            callbackURL: config.linkedin.callbackURL,
+            profileFields: ['id', 'first-name', 'last-name', 'email-address']
+        },
+        function(accessToken, refreshToken, profile, done) {
+            User.findOne({
+                'linkedin.id': profile.id
+            }, function (err, user) {
+                if (!user) {
+                    user = new User({
+                        name: profile.displayName,
+                        email: profile.emails[0].value,
+                        username: profile.emails[0].value,
+                        provider: 'linkedin'
+                    });
+                    user.save(function (err) {
                         if (err) console.log(err);
                         return done(err, user);
                     });

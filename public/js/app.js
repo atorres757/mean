@@ -1,1 +1,6 @@
-window.app = angular.module('MEAN', ['ngCookies', 'ngResource', 'ui.bootstrap']);
+'use strict';
+
+angular.module('mean', ['ngCookies', 'ngResource', 'ngRoute', 'ui.bootstrap', 'ui.route', 'mean.system', 'mean.articles']);
+
+angular.module('mean.system', []);
+angular.module('mean.articles', []);

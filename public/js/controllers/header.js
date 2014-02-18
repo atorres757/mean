@@ -1,14 +1,15 @@
-function HeaderController($scope, $location, Global) {
+'use strict';
+
+angular.module('mean.system').controller('HeaderController', ['$scope', 'Global', function ($scope, Global) {
     $scope.global = Global;
+
     $scope.menu = [{
-        "title": "Articles",
-        "link": "articles"
+        'title': 'Articles',
+        'link': 'articles'
     }, {
-        "title": "Create New Article",
-        "link": "articles/create"
+        'title': 'Create New Article',
+        'link': 'articles/create'
     }];
-
-    $scope.init = function() {
-
-    };
-}
+    
+    $scope.isCollapsed = false;
+}]);
