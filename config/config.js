@@ -3,10 +3,10 @@ var path = require('path'),
 
 module.exports = {
     development: {
-        db: 'mongodb://localhost/mean-dev',
+        db: 'mongodb://localhost/raterer',
         root: rootPath,
         app: {
-            name: 'MEAN - A Modern Stack - Development'
+            name: 'Raterer - Rate Something - Dev'
         },
         facebook: {
             clientID: "APP_ID",
@@ -30,10 +30,10 @@ module.exports = {
         }
     },
     test: {
-        db: 'mongodb://localhost/mean-test',
+        db: 'mongodb://localhost/raterer',
         root: rootPath,
         app: {
-            name: 'MEAN - A Modern Stack - Test'
+            name: 'Raterer - Rate Something - Test'
         },
         facebook: {
             clientID: "APP_ID",
@@ -57,10 +57,10 @@ module.exports = {
         }
     },
     production: {
-        db: 'mongodb://localhost/mean',
+        db: 'mongodb://localhost/raterer',
         root: rootPath,
         app: {
-            name: 'MEAN - A Modern Stack - Production'
+            name: 'Raterer - Rate Something - Production'
         },
         facebook: {
             clientID: "APP_ID",
